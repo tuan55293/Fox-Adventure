@@ -14,13 +14,13 @@ GameObject:
   - component: {fileID: 1251494310702543920}
   - component: {fileID: 1251494310702543933}
   - component: {fileID: 1415372474}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: player-idle-1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1251494310702543932
 Transform:
   m_ObjectHideFlags: 0
@@ -146,7 +146,8 @@ MonoBehaviour:
   climb: 0
   jump: 0
   doubleJump: 0
-  moveSpeed: 5
+  killEnemyVfx: {fileID: 1946677107317380889, guid: db2af33318b97bf4b8842fb24d98d83e, type: 3}
+  moveSpeed: 4
   groundCheck: 0
 --- !u!58 &1415372474
 CircleCollider2D:

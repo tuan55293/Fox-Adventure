@@ -100,7 +100,7 @@ public class PlayerController : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 animator.SetBool("jump", true);
-                rb.velocity = new Vector2(rb.velocity.x, Vector2.up.y * 13);
+                rb.velocity = new Vector2(rb.velocity.x, Vector2.up.y * 14);
                 doubleJump = false;
             }
         }
@@ -162,7 +162,7 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.CompareTag("TriggerEnemy"))
         {
-            Destroy(collision.gameObject.transform.root.gameObject);
+            collision.gameObject.transform.root.GetComponent<Enemy>().Die();
             if (killEnemyVfx)
             {
                 Instantiate(killEnemyVfx, collision.gameObject.transform.root.transform.position, Quaternion.identity);

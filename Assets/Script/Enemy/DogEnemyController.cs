@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DogEnemyController : MonoBehaviour
+public class DogEnemyController : Enemy
 {
     [SerializeField] Vector2 DistanceEnemyMove;
     public Vector2 leftLimit;
     public Vector2 rightLimit;
     public bool canleft;
     public bool canright;
-    [SerializeField] float enemyMoveSpeed;
+    //[SerializeField] float enemyMoveSpeed;
     Vector2 originalPos;
     Rigidbody2D rb;
 
@@ -21,7 +21,7 @@ public class DogEnemyController : MonoBehaviour
         rightLimit = originalPos + DistanceEnemyMove;
         rb.velocity = Vector2.right * enemyMoveSpeed;
         transform.localScale = new Vector2(transform.localScale.x * -1, transform.localScale.y);
-        Physics2D.IgnoreLayerCollision(8,8,true);
+        
 
     }
 
@@ -59,5 +59,9 @@ public class DogEnemyController : MonoBehaviour
             }
         }
 
+    }
+    public override void Die()
+    {
+        Destroy(gameObject);
     }
 }
