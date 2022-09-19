@@ -13,9 +13,12 @@ public class PlayerController : MonoBehaviour
 
     Rigidbody2D rb;
     Animator animator;
+
     public KillEnemyVfx killEnemyVfx;
+    public ItemVfx itemVfx;
+
     float moveDirectionX;
-    bool moving;
+    //bool moving;
     public float moveSpeed;
     public bool groundCheck;
 
@@ -157,9 +160,15 @@ public class PlayerController : MonoBehaviour
         {
             groundCheck = true;
         }
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            Destroy(gameObject);
+        }
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
+
+        //Handle collision with the enemy
         if (collision.CompareTag("TriggerEnemy"))
         {
             collision.gameObject.transform.root.GetComponent<Enemy>().Die();
@@ -170,6 +179,22 @@ public class PlayerController : MonoBehaviour
             rb.velocity = Vector2.up * 13;
             animator.SetBool("jump" , true);
         }
+        if (collision.CompareTag("Enemy"))
+        {
+            Destroy(gameObject);
+        }
+
+        if (collision.CompareTag("ItemCherry"))
+        {
+            Destroy(collision.gameObject);
+            if (itemVfx)
+            {
+                Instantiate(itemVfx, collision.gameObject.transform.position, Quaternion.identity);
+            }
+        }
+
+
+        ////Handle collision with the lader
         if (collision.CompareTag("checkladder"))
         {
             collision.gameObject.transform.root.GetComponent<Collider2D>().isTrigger = true;

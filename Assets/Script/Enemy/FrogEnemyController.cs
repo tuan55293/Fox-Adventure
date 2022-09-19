@@ -50,6 +50,7 @@ public class FrogEnemyController : Enemy
             playerController = player.gameObject.GetComponent<PlayerController>();
             hadFoundPlayer = true;
         }
+
     }
 
     public void FollowPlayer()
@@ -88,6 +89,7 @@ public class FrogEnemyController : Enemy
                 StopCoroutine(KillPlayer());
                 hadAuto = false;
                 hadFoundPlayer = false;
+                playerController = null;
             }
 
         }
