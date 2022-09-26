@@ -26,7 +26,7 @@ public class DogEnemyController : Enemy
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if(transform.position.x > rightLimit.x && canleft == false)
         {

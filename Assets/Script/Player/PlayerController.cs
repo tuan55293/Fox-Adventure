@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class PlayerController : MonoBehaviour
     public bool climb;
     public bool jump;
     public bool doubleJump;
+
+    int currentLevel;
 
     Rigidbody2D rb;
     Animator animator;
@@ -25,7 +28,8 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();    
+        animator = GetComponent<Animator>();
+        currentLevel = SceneManager.GetActiveScene().buildIndex;
     }
 
     private void Update()
@@ -82,7 +86,7 @@ public class PlayerController : MonoBehaviour
             if (groundCheck && jump == false && doubleJump == false)
             {
                 animator.SetBool("jump", true);
-                rb.velocity = new Vector2(rb.velocity.x, Vector2.up.y*15 );
+                rb.velocity = new Vector2(rb.velocity.x, Vector2.up.y*13);
                 groundCheck = false;
                 jump = true;
                 doubleJump = true;
@@ -103,7 +107,7 @@ public class PlayerController : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 animator.SetBool("jump", true);
-                rb.velocity = new Vector2(rb.velocity.x, Vector2.up.y * 14);
+                rb.velocity = new Vector2(rb.velocity.x, Vector2.up.y * 13);
                 doubleJump = false;
             }
         }
@@ -154,6 +158,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+    //Collison detected:
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Ladder"))
@@ -163,6 +178,19 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Enemy"))
         {
             Destroy(gameObject);
+        }
+        if (collision.gameObject.CompareTag("Goal"))
+        {
+            if (SceneManager.GetActiveScene().name.Equals("Level4"))
+            {
+                SceneManager.LoadScene("Title");
+                return;
+            }
+            PlayerPrefs.SetInt((LevelConst.LEVEl_PASSED + currentLevel), 1);
+            PlayerPrefs.SetInt(LevelConst.LEVEL_UNLOCKED + (currentLevel + 1), 1);
+            SceneManager.LoadScene((currentLevel+1));
+
+
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)

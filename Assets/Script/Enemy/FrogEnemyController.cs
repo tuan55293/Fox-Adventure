@@ -23,7 +23,7 @@ public class FrogEnemyController : Enemy
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         DetectedPlayer();
         if (hadAuto == false && hadFoundPlayer && jumped == false && groundCheck)

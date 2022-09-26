@@ -13,7 +13,7 @@ public class EagleController : Enemy
         rb = GetComponent<Rigidbody2D>();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         DetectedPlayer();
         KillPlayer();

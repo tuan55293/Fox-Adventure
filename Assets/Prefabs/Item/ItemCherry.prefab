@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3900939102575699046}
   - component: {fileID: 1231939726962781632}
   - component: {fileID: 3681408471854426128}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: ItemCherry
   m_TagString: ItemCherry
   m_Icon: {fileID: 0}
@@ -73,7 +73,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: bdce2a9cb3d0242958c2593a3b8d8742, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
