@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,6 +15,9 @@ public class PlayerController : MonoBehaviour
 
     int currentLevel;
 
+    public GameObject ghost;
+    bool hadGhost;
+
     Rigidbody2D rb;
     Animator animator;
 
@@ -21,7 +25,6 @@ public class PlayerController : MonoBehaviour
     public ItemVfx itemVfx;
 
     float moveDirectionX;
-    //bool moving;
     public float moveSpeed;
     public bool groundCheck;
 
@@ -41,7 +44,7 @@ public class PlayerController : MonoBehaviour
         Jump2();
         Climb();
     }
-    // Update is called once per frame
+
     void FixedUpdate()
     {
         Move();
@@ -59,9 +62,20 @@ public class PlayerController : MonoBehaviour
             }
             if ((moveDirectionX < 0 || moveDirectionX > 0) && groundCheck)
             {
+
+                if (hadGhost == false)
+                {
+                    StartCoroutine(GhostVfx());
+                    hadGhost = true;
+                }
                 animator.SetBool("run", true);
             }
-            if (moveDirectionX == 0) rb.velocity = new Vector2(Vector2.zero.x, rb.velocity.y);
+            if (moveDirectionX == 0) 
+            {
+                StopAllCoroutines();
+                hadGhost = false;
+                rb.velocity = new Vector2(Vector2.zero.x, rb.velocity.y);
+            } 
             rb.velocity = new Vector2(Vector2.right.x * moveSpeed * moveDirectionX,rb.velocity.y);
         }
     }
@@ -156,6 +170,25 @@ public class PlayerController : MonoBehaviour
 
             }
         }
+    }
+
+    void MakeGhost()
+    {
+        if (ghost)
+        {
+            Instantiate(ghost, transform.position, Quaternion.identity).transform.localScale = transform.localScale;
+        }
+    }
+
+    IEnumerator GhostVfx()
+    {
+        while (true)
+        {
+            MakeGhost();
+            yield return new WaitForSeconds(0.04f);
+        }
+
+        
     }
 
 

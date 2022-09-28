@@ -4328,6 +4328,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1251494310702543933, guid: 5ddabd8770170604196ef1c8c668d737, type: 3}
+      propertyPath: ghost
+      value: 
+      objectReference: {fileID: 7716483157263479294, guid: a4d9d53aeabca3b4dad71691ccc64bd3, type: 3}
+    - target: {fileID: 1251494310702543933, guid: 5ddabd8770170604196ef1c8c668d737, type: 3}
       propertyPath: itemVfx
       value: 
       objectReference: {fileID: 1117939903240591957, guid: 57bb06cfda3ec7a4688fb3e99787df55, type: 3}
