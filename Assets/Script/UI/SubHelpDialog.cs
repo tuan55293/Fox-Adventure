@@ -17,7 +17,7 @@ public class SubHelpDialog : DialogUI
         if(nextSub == null)
         {
             helpDialog.Show(false);
-            GameManager.Ins.helpAndpause.gameObject.SetActive(true);
+            GUIManager.Ins.helpAndpausePanel.gameObject.SetActive(true);
             Time.timeScale = 1;
             base.Show(false);
         }

@@ -12,6 +12,13 @@ TagManager:
   - Enemy
   - ItemCherry
   - Goal
+  - Platform
+  - TriggerJump
+  - TriggerDoubleJump
+  - TriggerDash
+  - Obstacle
+  - TriggerEnemyHelp
+  - TriggerClimb
   layers:
   - Default
   - TransparentFX

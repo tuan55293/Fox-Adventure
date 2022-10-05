@@ -6,10 +6,9 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Ins;
+    public GameObject player;
+    public bool gameOver;
 
-    public DialogUI pauseDialog;
-    public GameObject helpAndpause;
-    public HelpDialog helpDialog;
     public void Awake()
     {
         if (Ins)
@@ -24,29 +23,26 @@ public class GameManager : MonoBehaviour
     void Start() 
     { 
         Physics2D.IgnoreLayerCollision(8, 8, true);
-
+        PlayerPrefs.SetInt(LevelConst.LEVEl_PASSED + 1, 1);
+        PlayerPrefs.SetInt(LevelConst.LEVEL_UNLOCKED + 1, 1);
     }
-
-    // Update is called once per frame
     void Update()
     {
-        
-    }
-
-    public void PauseGame()
-    {
-        if (pauseDialog)
+        if (gameOver)
         {
-            helpAndpause.SetActive(false);
-            pauseDialog.Show(true);
-            Time.timeScale = 0;
+            Invoke("GameOver", 1);
+        }
+        if(player)
+        {
+            if(player.transform.position.y < -6)
+            GameOver();
         }
     }
-    public void ShowHelpDialog()
+
+    public void GameOver()
     {
-        helpDialog.Show(true);
-        Time.timeScale = 0;
-        helpAndpause.gameObject.SetActive(false);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+
 
 }

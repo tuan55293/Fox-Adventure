@@ -3,88 +3,138 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
+    [HideInInspector]
     public bool run;
+
+    [HideInInspector]
     public bool crouch;
-    public bool climb;
-    public bool jump;
+
+    [HideInInspector]
+    public bool canClimb;
+
+    [HideInInspector]
+    public bool aboveladder;
+
+    [HideInInspector]
+    public bool jumped;
+
+    [HideInInspector]
     public bool doubleJump;
+
+    [HideInInspector]
+    public bool hadDash;
+
+    [HideInInspector]
+    public bool die;
 
     int currentLevel;
 
+
+
     public GameObject ghost;
-    bool hadGhost;
+    PlayerJump playerJump;
+    PlayerDoubleJump playerDoubleJump;
+    PlayerDash playerDash;
+    GameObject Ladder;
 
-    Rigidbody2D rb;
-    Animator animator;
 
+    [HideInInspector]
+    public Rigidbody2D rb;
+
+    [HideInInspector]
+    public Animator animator;
+
+
+
+    public Image dash;
     public KillEnemyVfx killEnemyVfx;
     public ItemVfx itemVfx;
+
+
 
     float moveDirectionX;
     public float moveSpeed;
     public bool groundCheck;
 
+
+    public int DashEnergy;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        playerJump = GetComponent<PlayerJump>();
+        playerDoubleJump = GetComponent<PlayerDoubleJump>();
+        playerDash = GetComponent<PlayerDash>();
+        if (SceneManager.GetActiveScene().name.Equals("Tutorial"))
+        {
+            playerDoubleJump.enabled = false;
+            playerJump.enabled = false;
+            playerDash.enabled = false;
+        }
+        else
+        {
+            playerJump.enabled = false;
+            playerDoubleJump.enabled = true;
+            playerJump.enabled = true;
+            playerDash.enabled = true;
+        }
         animator = GetComponent<Animator>();
         currentLevel = SceneManager.GetActiveScene().buildIndex;
+        if (dash)
+        {
+            dash.fillAmount = 0;
+        }
     }
 
     private void Update()
     {
         moveDirectionX = Input.GetAxisRaw("Horizontal");
-
-        DoubleJump();
-        Jump();
         Jump2();
         Climb();
+        FillDashEnergy();
     }
 
     void FixedUpdate()
     {
-        Move();
+        if (hadDash == false)
+        {
+            Move();
+        }
     }
-    
+
     public void Move()
     {
-        
-        if (rb)
+
+        if (rb && die == false)
         {
             Flip();
             if (moveDirectionX == 0)
             {
                 animator.SetBool("run", false);
+                rb.velocity = new Vector2(Vector2.zero.x, rb.velocity.y);
             }
             if ((moveDirectionX < 0 || moveDirectionX > 0) && groundCheck)
             {
-
-                if (hadGhost == false)
-                {
-                    StartCoroutine(GhostVfx());
-                    hadGhost = true;
-                }
                 animator.SetBool("run", true);
             }
-            if (moveDirectionX == 0) 
+            if ((moveDirectionX < 0 || moveDirectionX > 0) && groundCheck == false)
             {
-                StopAllCoroutines();
-                hadGhost = false;
-                rb.velocity = new Vector2(Vector2.zero.x, rb.velocity.y);
-            } 
-            rb.velocity = new Vector2(Vector2.right.x * moveSpeed * moveDirectionX,rb.velocity.y);
+                animator.SetBool("run", false);
+            }
+            rb.velocity = new Vector2(Vector2.right.x * moveSpeed * moveDirectionX, rb.velocity.y);
         }
     }
 
     public void Flip()
     {
-        if(transform.localScale.x < 0 && moveDirectionX > 0)
+        if (transform.localScale.x < 0 && moveDirectionX > 0)
         {
-            transform.localScale = new Vector3(transform.localScale.x * -1, 
+            transform.localScale = new Vector3(transform.localScale.x * -1,
                                                 transform.localScale.y, transform.localScale.z);
         }
         if (transform.localScale.x > 0 && moveDirectionX < 0)
@@ -93,48 +143,10 @@ public class PlayerController : MonoBehaviour
                                                 transform.localScale.y, transform.localScale.z);
         }
     }
-    public void Jump()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (groundCheck && jump == false && doubleJump == false)
-            {
-                animator.SetBool("jump", true);
-                rb.velocity = new Vector2(rb.velocity.x, Vector2.up.y*13);
-                groundCheck = false;
-                jump = true;
-                doubleJump = true;
-            }
-        }
 
-        if (rb.velocity.y == 0)
-        {
-            jump = false;
-            doubleJump = false;
-            animator.SetBool("jump", false);
-        }
-    }
-    public void DoubleJump()
-    {
-        if (doubleJump == true)
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                animator.SetBool("jump", true);
-                rb.velocity = new Vector2(rb.velocity.x, Vector2.up.y * 13);
-                doubleJump = false;
-            }
-        }
-        if (rb.velocity.y == 0)
-        {
-            jump = false;
-            doubleJump = false;
-            animator.SetBool("jump", false);
-        }
-    }
     public void Jump2()
     {
-        if (rb)
+        if (rb && die == false)
         {
             if (rb.velocity.y < 0 && groundCheck == false && doubleJump == false)
             {
@@ -145,7 +157,7 @@ public class PlayerController : MonoBehaviour
                 animator.SetBool("jump2", false);
 
             }
-            if((jump == false && rb.velocity.y < -3) ||( jump == true && doubleJump == true && rb.velocity.y < -18))
+            if ((jumped == false && rb.velocity.y < -3) || (jumped == true && doubleJump == true && rb.velocity.y < -18))
             {
                 animator.SetBool("jump2", true);
             }
@@ -153,43 +165,40 @@ public class PlayerController : MonoBehaviour
     }
     public void Climb()
     {
-        if (climb)
+        if (Input.GetKey(KeyCode.W) && (canClimb && die == false))
         {
-            if (Input.GetKey(KeyCode.W))
+            animator.SetBool("climb", true);
+            hadDash = false;
+            transform.position += new Vector3(0, Vector3.up.y * 3 * Time.deltaTime);
+        }
+
+        if ((Input.GetKey(KeyCode.S) && (canClimb && die == false)))
+        {
+            animator.SetBool("climb", true);
+            hadDash = false;
+            transform.position += new Vector3(0, Vector3.down.y * 3 * Time.deltaTime);
+        }
+        if (Input.GetKey(KeyCode.S) && aboveladder)
+        {
+            if (Ladder)
             {
-                animator.SetBool("climb", true);
-                rb.gravityScale = 0;
-                transform.position += new Vector3(0,Vector3.up.y*3*Time.deltaTime);
+                Ladder.GetComponent<Collider2D>().isTrigger = true;
             }
-
-            if (Input.GetKey(KeyCode.S))
-            {
-                animator.SetBool("climb", true);
-                rb.gravityScale = 0;
-                transform.position += new Vector3(0, Vector3.down.y * 3 * Time.deltaTime);
-
-            }
+            animator.SetBool("climb", true);
+            hadDash = false;
+            transform.position += new Vector3(0, Vector3.down.y * 3 * Time.deltaTime);
         }
     }
 
-    void MakeGhost()
+
+    void FillDashEnergy()
     {
-        if (ghost)
+        if (dash)
         {
-            Instantiate(ghost, transform.position, Quaternion.identity).transform.localScale = transform.localScale;
+            dash.fillAmount = DashEnergy / 15f;
         }
     }
 
-    IEnumerator GhostVfx()
-    {
-        while (true)
-        {
-            MakeGhost();
-            yield return new WaitForSeconds(0.04f);
-        }
-
-        
-    }
 
 
 
@@ -204,13 +213,18 @@ public class PlayerController : MonoBehaviour
     //Collison detected:
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Ladder"))
+        if (collision.gameObject.CompareTag("Ground"))
         {
             groundCheck = true;
         }
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            Destroy(gameObject);
+            rb.gravityScale = 0;
+            rb.velocity = Vector2.zero;
+            gameObject.GetComponent<Collider2D>().isTrigger = true;
+            animator.SetBool("die", true);
+            die = true;
+            GameManager.Ins.gameOver = true;
         }
         if (collision.gameObject.CompareTag("Goal"))
         {
@@ -219,11 +233,29 @@ public class PlayerController : MonoBehaviour
                 SceneManager.LoadScene("Title");
                 return;
             }
+            if (SceneManager.GetActiveScene().name.Equals("Tutorial"))
+            {
+                GUIManager.Ins.ShowCompleteTutorialDialog();
+                PlayerPrefs.SetInt((LevelConst.LEVEl_PASSED + "Tutorial"), 1);
+                return;
+            }
             PlayerPrefs.SetInt((LevelConst.LEVEl_PASSED + currentLevel), 1);
             PlayerPrefs.SetInt(LevelConst.LEVEL_UNLOCKED + (currentLevel + 1), 1);
-            SceneManager.LoadScene((currentLevel+1));
+            SceneManager.LoadScene(LevelConst.LEVEL_UNLOCKED + (currentLevel+1));
+        }
 
-
+        if (collision.gameObject.CompareTag("Platform"))
+        {
+            gameObject.transform.SetParent(collision.gameObject.transform);
+            groundCheck = true;
+        }
+    }
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Platform"))
+        {
+            gameObject.transform.SetParent(null);
+            groundCheck = false;
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)
@@ -238,20 +270,32 @@ public class PlayerController : MonoBehaviour
                 Instantiate(killEnemyVfx, collision.gameObject.transform.root.transform.position, Quaternion.identity);
             }
             rb.velocity = Vector2.up * 13;
-            animator.SetBool("jump" , true);
+            animator.SetBool("jump", true);
         }
         if (collision.CompareTag("Enemy"))
         {
             Destroy(gameObject);
         }
+        if (collision.CompareTag("Obstacle"))
+        {
+            animator.SetBool("die", true);
+            die = true;
+            GameManager.Ins.gameOver = true;
+        }
 
+        //handle collision with item
         if (collision.CompareTag("ItemCherry"))
         {
+            if (DashEnergy < 15)
+            {
+                DashEnergy++;
+            }
             Destroy(collision.gameObject);
             if (itemVfx)
             {
                 Instantiate(itemVfx, collision.gameObject.transform.position, Quaternion.identity);
             }
+
         }
 
 
@@ -259,22 +303,55 @@ public class PlayerController : MonoBehaviour
         if (collision.CompareTag("checkladder"))
         {
             collision.gameObject.transform.root.GetComponent<Collider2D>().isTrigger = true;
-            
+
         }
         if (collision.CompareTag("aboveLadder"))
         {
-            climb = true;
-            rb.velocity = Vector3.zero;
+            aboveladder = true;
             collision.gameObject.transform.root.GetComponent<Collider2D>().isTrigger = true;
         }
         if (collision.CompareTag("Ladder"))
         {
+            Ladder = collision.gameObject;
             rb.velocity = Vector3.zero;
             rb.gravityScale = 0;
-            if (!climb)
+            if (!canClimb)
             {
-                climb = true;
+                canClimb = true;
             }
+        }
+
+        //Trigger dialog tutorial
+        if (collision.CompareTag("TriggerJump"))
+        {
+            playerJump.enabled = true;
+            collision.gameObject.SetActive(false);
+            GUIManager.Ins.ShowHelpDialogTriggerJumpTutorial();
+        }
+        if (collision.CompareTag("TriggerDoubleJump"))
+        {
+            playerJump.enabled = false;
+            playerDoubleJump.enabled = true;
+            playerJump.enabled = true;
+            collision.gameObject.SetActive(false);
+            GUIManager.Ins.ShowHelpDialogTriggerDoubleJumpTutorial();
+        }
+        if (collision.CompareTag("TriggerDash"))
+        {
+            playerDash.enabled = true;
+            collision.gameObject.SetActive(false);
+            GUIManager.Ins.dashPanel.SetActive(true);
+            GUIManager.Ins.ShowHelpDialogTriggerDashTutorial();
+        }
+        if (collision.CompareTag("TriggerEnemyHelp"))
+        {
+            collision.gameObject.SetActive(false);
+            GUIManager.Ins.ShowHelpDialogTriggerEnemyHelpTutorial();
+        }
+        if (collision.CompareTag("TriggerClimb"))
+        {
+            collision.gameObject.SetActive(false);
+            GUIManager.Ins.ShowHelpDialogTriggerClimbTutorial();
         }
 
     }
@@ -282,11 +359,11 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.CompareTag("Ladder"))
         {
-            climb = false;
+            canClimb = false;
             collision.GetComponent<Collider2D>().isTrigger = false;
-            rb.gravityScale = 5;
+            rb.gravityScale = 4;
             animator.SetBool("climb", false);
+            animator.SetBool("jump2", true);
         }
     }
-
 }
