@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
 
     public void Awake()
     {
+        Time.timeScale = 1f;
         if (Ins)
         {
             Destroy(gameObject);
@@ -30,12 +31,7 @@ public class GameManager : MonoBehaviour
     {
         if (gameOver)
         {
-            Invoke("GameOver", 1);
-        }
-        if(player)
-        {
-            if(player.transform.position.y < -6)
-            GameOver();
+            Invoke("GameOver", 0.5f);
         }
     }
 

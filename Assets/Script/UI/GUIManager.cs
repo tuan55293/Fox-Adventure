@@ -85,7 +85,7 @@ public class GUIManager : MonoBehaviour
         {
             helpAndpausePanel.SetActive(true);
             pauseDialog.SetActive(false);
-            Time.timeScale = 0;
+            Time.timeScale = 1;
         }
     }
 
@@ -205,13 +205,8 @@ public class GUIManager : MonoBehaviour
     { 
         if(PlayerPrefs.GetInt(LevelConst.LEVEL_UNLOCKED + "1") == 1)
         {
-            if (SceneManager.GetSceneByName("Level1").IsValid())
-            {
                 SceneManager.LoadScene("Level1");
                 Time.timeScale = 1;
-            }
-            
-            
         }
     }
     public void ShowConditionLevel1()

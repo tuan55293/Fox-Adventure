@@ -21,7 +21,7 @@ public class PlayerJump : MonoBehaviour
             if (c.groundCheck && c.jumped == false && c.doubleJump == false)
             {
                 c.animator.SetBool("jump", true);
-                c.rb.velocity = new Vector2(c.rb.velocity.x, Vector2.up.y * 13);
+                c.rb.velocity = new Vector2(c.rb.velocity.x, Vector2.up.y * 12);
                 c.groundCheck = false;
                 c.jumped = true;
                 c.doubleJump = true;

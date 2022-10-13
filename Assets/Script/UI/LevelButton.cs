@@ -36,11 +36,7 @@ public class LevelButton : MonoBehaviour
         }
         if (PlayerPrefs.GetInt(LevelConst.LEVEL_UNLOCKED + level) == 1)
         {
-            if(SceneManager.GetSceneByName(LevelConst.LEVEL_UNLOCKED + level).IsValid())
-            {
                 SceneManager.LoadScene(LevelConst.LEVEL_UNLOCKED + level);
-            }
-
         }
 
     }

@@ -180,6 +180,7 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.S) && aboveladder)
         {
+            aboveladder = false;
             if (Ladder)
             {
                 Ladder.GetComponent<Collider2D>().isTrigger = true;
@@ -228,6 +229,7 @@ public class PlayerController : MonoBehaviour
         }
         if (collision.gameObject.CompareTag("Goal"))
         {
+
             if (SceneManager.GetActiveScene().name.Equals("Level4"))
             {
                 SceneManager.LoadScene("Title");
@@ -241,7 +243,8 @@ public class PlayerController : MonoBehaviour
             }
             PlayerPrefs.SetInt((LevelConst.LEVEl_PASSED + currentLevel), 1);
             PlayerPrefs.SetInt(LevelConst.LEVEL_UNLOCKED + (currentLevel + 1), 1);
-            SceneManager.LoadScene(LevelConst.LEVEL_UNLOCKED + (currentLevel+1));
+            SceneManager.LoadScene(LevelConst.LEVEL_UNLOCKED + (currentLevel + 1));
+
         }
 
         if (collision.gameObject.CompareTag("Platform"))
@@ -264,23 +267,26 @@ public class PlayerController : MonoBehaviour
         //Handle collision with the enemy
         if (collision.CompareTag("TriggerEnemy"))
         {
-            collision.gameObject.transform.root.GetComponent<Enemy>().Die();
-            if (killEnemyVfx)
+            if(die == false)
             {
-                Instantiate(killEnemyVfx, collision.gameObject.transform.root.transform.position, Quaternion.identity);
+                collision.gameObject.transform.parent.GetComponent<Enemy>().Die();
+                if (killEnemyVfx)
+                {
+                    Instantiate(killEnemyVfx, collision.gameObject.transform.parent.transform.position, Quaternion.identity);
+                }
+                rb.velocity = Vector2.up * 13;
+                animator.SetBool("jump", true);
             }
-            rb.velocity = Vector2.up * 13;
-            animator.SetBool("jump", true);
         }
-        if (collision.CompareTag("Enemy"))
-        {
-            Destroy(gameObject);
-        }
-        if (collision.CompareTag("Obstacle"))
+        if (collision.CompareTag("Obstacle") )
         {
             animator.SetBool("die", true);
             die = true;
             GameManager.Ins.gameOver = true;
+        }
+        if (collision.CompareTag("DeadZone"))
+        {
+            GameManager.Ins.GameOver();
         }
 
         //handle collision with item
@@ -364,6 +370,10 @@ public class PlayerController : MonoBehaviour
             rb.gravityScale = 4;
             animator.SetBool("climb", false);
             animator.SetBool("jump2", true);
+        }
+        if (collision.CompareTag("aboveLadder"))
+        {
+            aboveladder = false;
         }
     }
 }

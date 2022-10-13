@@ -5,8 +5,10 @@ using UnityEngine;
 public class PlayerDash : MonoBehaviour
 {
     PlayerController c;
+    bool canDash;
     void Start()
     {
+        canDash = true;
         c = GetComponent<PlayerController>();
     }
 
@@ -17,7 +19,7 @@ public class PlayerDash : MonoBehaviour
 
     void Dash()
     {
-        if (Input.GetKeyDown(KeyCode.LeftShift) && c.DashEnergy >= 5 && c.hadDash == false && c.die == false && c.canClimb == false)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && c.DashEnergy >= 5 && c.hadDash == false && c.die == false && c.canClimb == false && canDash)
         {
             c.DashEnergy -= 5;
             if (c.dash)
@@ -26,6 +28,7 @@ public class PlayerDash : MonoBehaviour
             }
 
             c.hadDash = true;
+            canDash = false;
             c.animator.SetBool("run", false);
             c.animator.SetBool("dash", true);
             StartCoroutine("DashTime");
@@ -37,12 +40,14 @@ public class PlayerDash : MonoBehaviour
     {
         c.rb.gravityScale = 0;
         c.rb.velocity = transform.localScale.x * Vector2.right * 5f;
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.13f);
         c.rb.velocity = Vector2.zero;
         c.rb.gravityScale = 4;
         c.hadDash = false;
         c.animator.SetBool("dash", false);
         StopCoroutine("GhostVfx");
+        yield return new WaitForSeconds(1f);
+        canDash = true;
         StopCoroutine("DashTime");
 
     }

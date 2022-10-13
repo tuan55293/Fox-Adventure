@@ -21,7 +21,7 @@ public class PlayerDoubleJump : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 c.animator.SetBool("jump", true);
-                c.rb.velocity = new Vector2(c.rb.velocity.x, Vector2.up.y * 12);
+                c.rb.velocity = new Vector2(c.rb.velocity.x, Vector2.up.y * 11);
                 c.doubleJump = false;
             }
         }

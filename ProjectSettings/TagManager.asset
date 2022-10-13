@@ -19,6 +19,7 @@ TagManager:
   - Obstacle
   - TriggerEnemyHelp
   - TriggerClimb
+  - DeadZone
   layers:
   - Default
   - TransparentFX
