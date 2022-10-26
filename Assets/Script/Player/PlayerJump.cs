@@ -18,19 +18,21 @@ public class PlayerJump : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) && c.die == false && c.canClimb == false )
         {
-            if (c.groundCheck && c.jumped == false && c.doubleJump == false)
+            if (c.groundCheck && c.jumped == false && c.canDoubleJump == false)
             {
-                c.animator.SetBool("jump", true);
+                AudioController.Ins.PlaySound(AudioController.Ins.jump);
                 c.rb.velocity = new Vector2(c.rb.velocity.x, Vector2.up.y * 12);
+                c.animator.SetBool("jump2", false);
+                c.animator.SetBool("jump", true);
                 c.groundCheck = false;
                 c.jumped = true;
-                c.doubleJump = true;
+                c.canDoubleJump = true;
             }
         }
-        if (c.rb.velocity.y == 0)
+        if (c.rb.velocity.y == 0 || c.groundCheck)
         {
             c.jumped = false;
-            c.doubleJump = false;
+            c.canDoubleJump = false;
             c.animator.SetBool("jump", false);
         }
     }

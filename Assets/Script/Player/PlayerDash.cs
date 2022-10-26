@@ -21,6 +21,7 @@ public class PlayerDash : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.LeftShift) && c.DashEnergy >= 5 && c.hadDash == false && c.die == false && c.canClimb == false && canDash)
         {
+            AudioController.Ins.PlaySound(AudioController.Ins.dash);
             c.DashEnergy -= 5;
             if (c.dash)
             {

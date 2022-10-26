@@ -11,20 +11,18 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     public bool run;
 
-    [HideInInspector]
-    public bool crouch;
 
-    [HideInInspector]
     public bool canClimb;
 
-    [HideInInspector]
+
     public bool aboveladder;
+
 
     [HideInInspector]
     public bool jumped;
 
     [HideInInspector]
-    public bool doubleJump;
+    public bool canDoubleJump;
 
     [HideInInspector]
     public bool hadDash;
@@ -109,7 +107,10 @@ public class PlayerController : MonoBehaviour
 
     public void Move()
     {
-
+        if(rb.gravityScale == 0)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, 0);
+        }
         if (rb && die == false)
         {
             Flip();
@@ -118,11 +119,11 @@ public class PlayerController : MonoBehaviour
                 animator.SetBool("run", false);
                 rb.velocity = new Vector2(Vector2.zero.x, rb.velocity.y);
             }
-            if ((moveDirectionX < 0 || moveDirectionX > 0) && groundCheck)
+            if ((moveDirectionX != 0 ) && groundCheck && jumped == false)
             {
                 animator.SetBool("run", true);
             }
-            if ((moveDirectionX < 0 || moveDirectionX > 0) && groundCheck == false)
+            if ((moveDirectionX !=0 ) && groundCheck == false)
             {
                 animator.SetBool("run", false);
             }
@@ -148,7 +149,7 @@ public class PlayerController : MonoBehaviour
     {
         if (rb && die == false)
         {
-            if (rb.velocity.y < 0 && groundCheck == false && doubleJump == false)
+            if (rb.velocity.y < 0 && groundCheck == false && canDoubleJump == false)
             {
                 animator.SetBool("jump2", true);
             }
@@ -157,7 +158,7 @@ public class PlayerController : MonoBehaviour
                 animator.SetBool("jump2", false);
 
             }
-            if ((jumped == false && rb.velocity.y < -3) || (jumped == true && doubleJump == true && rb.velocity.y < -18))
+            if ((jumped == false && rb.velocity.y < -3) || (jumped == true && canDoubleJump == true && rb.velocity.y < -10))
             {
                 animator.SetBool("jump2", true);
             }
@@ -180,7 +181,6 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.S) && aboveladder)
         {
-            aboveladder = false;
             if (Ladder)
             {
                 Ladder.GetComponent<Collider2D>().isTrigger = true;
@@ -214,36 +214,45 @@ public class PlayerController : MonoBehaviour
     //Collison detected:
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("EagleEnemy"))
         {
-            groundCheck = true;
-        }
-        if (collision.gameObject.CompareTag("Enemy"))
-        {
-            rb.gravityScale = 0;
+            gameObject.GetComponent<Collider2D>().enabled = false;
             rb.velocity = Vector2.zero;
-            gameObject.GetComponent<Collider2D>().isTrigger = true;
+            rb.gravityScale = 0;
             animator.SetBool("die", true);
             die = true;
             GameManager.Ins.gameOver = true;
         }
+        if (collision.gameObject.CompareTag("TriggerEnemy"))
+        {
+            if (die == false)
+            {
+                collision.gameObject.transform.parent.GetComponent<Enemy>().Die();
+                if (killEnemyVfx && collision.gameObject)
+                {
+                    Instantiate(killEnemyVfx, collision.gameObject.transform.parent.transform.position, Quaternion.identity);
+                }
+                AudioController.Ins.PlaySound(AudioController.Ins.killEnemy);
+                rb.velocity = Vector2.up * 13;
+                animator.SetBool("jump", true);
+            }
+        }
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            groundCheck = true;
+        }
+
         if (collision.gameObject.CompareTag("Goal"))
         {
-
-            if (SceneManager.GetActiveScene().name.Equals("Level4"))
-            {
-                SceneManager.LoadScene("Title");
-                return;
-            }
+            AudioController.Ins.PlaySound(AudioController.Ins.win);
+            GUIManager.Ins.ShowCompleteDialog();
             if (SceneManager.GetActiveScene().name.Equals("Tutorial"))
             {
-                GUIManager.Ins.ShowCompleteTutorialDialog();
                 PlayerPrefs.SetInt((LevelConst.LEVEl_PASSED + "Tutorial"), 1);
                 return;
             }
             PlayerPrefs.SetInt((LevelConst.LEVEl_PASSED + currentLevel), 1);
             PlayerPrefs.SetInt(LevelConst.LEVEL_UNLOCKED + (currentLevel + 1), 1);
-            SceneManager.LoadScene(LevelConst.LEVEL_UNLOCKED + (currentLevel + 1));
 
         }
 
@@ -252,6 +261,7 @@ public class PlayerController : MonoBehaviour
             gameObject.transform.SetParent(collision.gameObject.transform);
             groundCheck = true;
         }
+
     }
     private void OnCollisionExit2D(Collision2D collision)
     {
@@ -265,20 +275,8 @@ public class PlayerController : MonoBehaviour
     {
 
         //Handle collision with the enemy
-        if (collision.CompareTag("TriggerEnemy"))
-        {
-            if(die == false)
-            {
-                collision.gameObject.transform.parent.GetComponent<Enemy>().Die();
-                if (killEnemyVfx)
-                {
-                    Instantiate(killEnemyVfx, collision.gameObject.transform.parent.transform.position, Quaternion.identity);
-                }
-                rb.velocity = Vector2.up * 13;
-                animator.SetBool("jump", true);
-            }
-        }
-        if (collision.CompareTag("Obstacle") )
+
+        if (collision.CompareTag("Obstacle"))
         {
             animator.SetBool("die", true);
             die = true;
@@ -292,6 +290,7 @@ public class PlayerController : MonoBehaviour
         //handle collision with item
         if (collision.CompareTag("ItemCherry"))
         {
+            AudioController.Ins.PlaySound(AudioController.Ins.collectItem);
             if (DashEnergy < 15)
             {
                 DashEnergy++;
@@ -309,6 +308,10 @@ public class PlayerController : MonoBehaviour
         if (collision.CompareTag("checkladder"))
         {
             collision.gameObject.transform.root.GetComponent<Collider2D>().isTrigger = true;
+            canClimb = true;
+            rb.velocity = Vector3.zero;
+            rb.gravityScale = 0;
+            animator.SetBool("climb", true);
 
         }
         if (collision.CompareTag("aboveLadder"))
@@ -321,10 +324,7 @@ public class PlayerController : MonoBehaviour
             Ladder = collision.gameObject;
             rb.velocity = Vector3.zero;
             rb.gravityScale = 0;
-            if (!canClimb)
-            {
-                canClimb = true;
-            }
+            canClimb = true;
         }
 
         //Trigger dialog tutorial
@@ -363,17 +363,23 @@ public class PlayerController : MonoBehaviour
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.CompareTag("Ladder"))
+        if (collision.CompareTag("Ladder") )
         {
             canClimb = false;
-            collision.GetComponent<Collider2D>().isTrigger = false;
             rb.gravityScale = 4;
             animator.SetBool("climb", false);
-            animator.SetBool("jump2", true);
         }
         if (collision.CompareTag("aboveLadder"))
         {
             aboveladder = false;
+        }
+        if (collision.CompareTag("checkladder"))
+        {
+            canClimb = false;
+            collision.transform.root.GetComponent<Collider2D>().isTrigger = false;
+            rb.gravityScale = 4;
+            animator.SetBool("climb", false);
+            animator.SetBool("jump2", true);
         }
     }
 }

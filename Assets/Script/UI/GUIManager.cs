@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GUIManager : MonoBehaviour
 {
@@ -10,12 +11,17 @@ public class GUIManager : MonoBehaviour
     public GameObject mainMenu;
     public GameObject levelSelectUI;
     public GameObject pauseDialog;
+    public GameObject settingVolume;
     public GameObject helpAndpausePanel;
     public HelpDialog helpDialog;
     public GameObject dashPanel;
-    public GameObject completeTutorialDialog;
+    public GameObject completeLevelDialog;
     public GameObject conditionLevel1;
+    public GameObject unLockedDialog;
+    public Slider sliderBGVolume;
+    public Slider sliderSFXVolume;
 
+    public GameObject triggerMove;
     public GameObject triggerJump;
     public GameObject triggerDoubleJump;
     public GameObject triggerDash;
@@ -41,6 +47,77 @@ public class GUIManager : MonoBehaviour
             {
                 dashPanel.SetActive(false);
             }
+        }
+        if (SceneManager.GetActiveScene().name.Equals("Tutorial"))
+        {
+            if (triggerMove)
+            {
+                ShowMoveTriggerTutorial();
+            }
+        }
+        LoadVolume();
+    }
+    void LoadVolume()
+    {
+        if (sliderBGVolume != null && sliderSFXVolume != null)
+        {
+            sliderBGVolume.value = PlayerPrefs.GetFloat("BGVolume", 1);
+            sliderSFXVolume.value = PlayerPrefs.GetFloat("SFXVolume", 1);
+            AudioController.Ins.musicAus.volume = sliderBGVolume.value;
+            AudioController.Ins.sfxAus.volume = sliderSFXVolume.value;
+        }
+    }
+    public void ChangeBGVolume()
+    {
+        if (sliderBGVolume != null)
+        {
+            AudioController.Ins.musicAus.volume = sliderBGVolume.value;
+
+            PlayerPrefs.SetFloat("BGVolume", sliderBGVolume.value);
+        }
+
+    }
+    public void ChangeSFXVolume()
+    {
+        if (sliderSFXVolume != null)
+        {
+            AudioController.Ins.sfxAus.volume = sliderSFXVolume.value;
+            PlayerPrefs.SetFloat("SFXVolume", sliderSFXVolume.value);
+        }
+
+    }
+    public void ShowSettingVolume()
+    {
+        if (settingVolume)
+        {
+            Time.timeScale = 0;
+            if (mainMenu)
+            {
+                mainMenu.SetActive(false);
+            }
+            settingVolume.SetActive(true);
+            if (helpAndpausePanel)
+            {
+                helpAndpausePanel.SetActive(false);
+            }
+
+        }
+    }
+    public void CloseSettingVolume()
+    {
+        if (settingVolume)
+        {
+            Time.timeScale = 1;
+            if (mainMenu)
+            {
+                mainMenu.SetActive(true);
+            }
+            settingVolume.SetActive(false);
+            if (helpAndpausePanel)
+            {
+                helpAndpausePanel.SetActive(true);
+            }
+
         }
     }
     public void ShowLevelSelect()
@@ -89,6 +166,14 @@ public class GUIManager : MonoBehaviour
         }
     }
 
+    public void ShowUnlockedLevelDialog()
+    {
+        if (unLockedDialog && mainMenu)
+        {
+            unLockedDialog.SetActive(true);
+            mainMenu.SetActive(false);
+        }
+    }
     public void ShowHelpDialog()
     {
         if (helpDialog && helpAndpausePanel)
@@ -98,7 +183,24 @@ public class GUIManager : MonoBehaviour
             helpAndpausePanel.gameObject.SetActive(false);
         }
     }
-
+    public void ShowMoveTriggerTutorial()
+    {
+        if (triggerMove && helpAndpausePanel)
+        {
+            triggerMove.SetActive(true);
+            helpAndpausePanel.gameObject.SetActive(false);
+            Time.timeScale = 0;
+        }
+    }
+    public void CloseMoveTriggerTutorial()
+    {
+        if (triggerMove && helpAndpausePanel)
+        {
+            triggerMove.SetActive(false);
+            helpAndpausePanel.gameObject.SetActive(true);
+            Time.timeScale = 1;
+        }
+    }
     public void ShowHelpDialogTriggerJumpTutorial()
     {
         if (triggerJump && helpAndpausePanel)
@@ -192,11 +294,11 @@ public class GUIManager : MonoBehaviour
         }
     }
 
-    public void ShowCompleteTutorialDialog()
+    public void ShowCompleteDialog()
     {
-        if (completeTutorialDialog && helpAndpausePanel)
+        if (completeLevelDialog && helpAndpausePanel)
         {
-            completeTutorialDialog.SetActive(true);
+            completeLevelDialog.SetActive(true);
             helpAndpausePanel.gameObject.SetActive(false);
             Time.timeScale = 0;
         }

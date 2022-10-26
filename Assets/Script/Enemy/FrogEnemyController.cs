@@ -44,7 +44,7 @@ public class FrogEnemyController : Enemy
 
     public void DetectedPlayer()
     {
-        Collider2D player = Physics2D.OverlapCircle((Vector2)transform.position, 5, playerLayer);
+        Collider2D player = Physics2D.OverlapCircle((Vector2)transform.position, 6, playerLayer);
         if (player)
         {
             playerController = player.gameObject.GetComponent<PlayerController>();
@@ -57,7 +57,7 @@ public class FrogEnemyController : Enemy
     {
         if (hadFoundPlayer)
         {
-            if (Vector2.Distance(transform.position, playerController.transform.position) < 10)
+            if (Vector2.Distance(transform.position, playerController.transform.position) < 15)
             {
                 if (Camera.main.WorldToViewportPoint(transform.position).x > 0.5f)
                 {
@@ -113,7 +113,7 @@ public class FrogEnemyController : Enemy
         while (hadFoundPlayer)
         {
             FollowPlayer();
-            yield return new WaitForSeconds(3);
+            yield return new WaitForSeconds(1);
         }
 
     }
@@ -125,6 +125,13 @@ public class FrogEnemyController : Enemy
             groundCheck = true;
             JumpAnimation(false);
             jumped = false;
+        }
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("DeadZone"))
+        {
+            Die();
         }
     }
 

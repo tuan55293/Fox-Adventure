@@ -7,10 +7,4 @@ using UnityEngine.SceneManagement;
 public class PauseDIalog : DialogUI
 {
 
-
-    
-
-
-
-
 }

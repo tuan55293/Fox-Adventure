@@ -13,14 +13,14 @@ public class EagleController : Enemy
         rb = GetComponent<Rigidbody2D>();
     }
 
-    void FixedUpdate()
+    void Update()
     {
         DetectedPlayer();
         KillPlayer();
     }
     void DetectedPlayer()
     {
-        Collider2D player = Physics2D.OverlapCircle((Vector2)transform.position, 5, playerLayer);
+        Collider2D player = Physics2D.OverlapCircle((Vector2)transform.position, 7, playerLayer);
         if (player)
         {
             playerController = player.gameObject.GetComponent<PlayerController>();

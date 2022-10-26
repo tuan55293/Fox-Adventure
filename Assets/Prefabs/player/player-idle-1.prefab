@@ -13,10 +13,10 @@ GameObject:
   - component: {fileID: 1251494310702543921}
   - component: {fileID: 1251494310702543920}
   - component: {fileID: 1251494310702543933}
-  - component: {fileID: 1415372474}
   - component: {fileID: 9200691423421896853}
   - component: {fileID: 1415372478}
   - component: {fileID: 1415372485}
+  - component: {fileID: 3175689519569118666}
   m_Layer: 3
   m_Name: player-idle-1
   m_TagString: Untagged
@@ -108,7 +108,7 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 4
   m_Material: {fileID: 0}
-  m_Interpolate: 2
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -145,11 +145,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   run: 0
-  crouch: 0
   canClimb: 0
   aboveladder: 0
   jumped: 0
-  doubleJump: 0
+  canDoubleJump: 0
   hadDash: 0
   die: 0
   ghost: {fileID: 7716483157263479294, guid: a4d9d53aeabca3b4dad71691ccc64bd3, type: 3}
@@ -157,26 +156,10 @@ MonoBehaviour:
   animator: {fileID: 0}
   dash: {fileID: 0}
   killEnemyVfx: {fileID: 1946677107317380889, guid: db2af33318b97bf4b8842fb24d98d83e, type: 3}
-  itemVfx: {fileID: 1117939903240591957, guid: 57bb06cfda3ec7a4688fb3e99787df55, type: 3}
+  itemVfx: {fileID: 1117939903240591957, guid: 06bf8ffb6fe99ec40aa1edd326792325, type: 3}
   moveSpeed: 5
   groundCheck: 0
   DashEnergy: 0
---- !u!58 &1415372474
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1251494310702543927}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 6200000, guid: eeb78ef7ffe56244a9653ace4d574927, type: 2}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: -0.011059592, y: -0.0551777}
-  serializedVersion: 2
-  m_Radius: 0.093495175
 --- !u!114 &9200691423421896853
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,3 +196,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0389b763021f95944bbc6ceca114f76e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!58 &3175689519569118666
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1251494310702543927}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 6200000, guid: eeb78ef7ffe56244a9653ace4d574927, type: 2}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -0.008485145, y: -0.073990405}
+  serializedVersion: 2
+  m_Radius: 0.07845168

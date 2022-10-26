@@ -29,7 +29,7 @@ public class LevelButton : MonoBehaviour
     }
     public void EnterLevel()
     {
-        if (level == 1 && PlayerPrefs.GetInt(LevelConst.LEVEl_PASSED + "Tutorial",0) != 1)
+        if (PlayerPrefs.GetInt(LevelConst.LEVEL_UNLOCKED + level) == 1 && PlayerPrefs.GetInt(LevelConst.LEVEl_PASSED + "Tutorial",0) != 1)
         {
             GUIManager.Ins.ShowConditionLevel1();
             return;
