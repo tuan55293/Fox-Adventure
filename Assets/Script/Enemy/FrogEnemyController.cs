@@ -113,7 +113,7 @@ public class FrogEnemyController : Enemy
         while (hadFoundPlayer)
         {
             FollowPlayer();
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(2);
         }
 
     }
